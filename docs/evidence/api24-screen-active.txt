@@ -1,0 +1,1 @@
+  mHoldScreenWindow=Window{a1fdb06 u0 ar.com.chessclock.chessclock/ar.com.chessclock.chessclock.MainActivity}

@@ -1,0 +1,7 @@
+00:00 +0: loading D:/Desarrollo/.Projects/Mobile/chessclock/integration_test/game_flow_test.dart
+Running Gradle task 'assembleDebug'...                             15.3s
+√ Built build\app\outputs\flutter-apk\app-debug.apk
+Installing build\app\outputs\flutter-apk\app-debug.apk...           4.5s
+00:00 +0: Android: private storage, all modes, touch, pause, alarm and restore
+00:09 +1: (tearDownAll)
+00:09 +1: All tests passed!

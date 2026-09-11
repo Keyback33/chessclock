@@ -1,0 +1,3 @@
+dist/chessclock-1.0.0.apk: 1 file pushed, 0 skipped. 70.3 MB/s (48230608 bytes in 0.655s)
+Performing Push Install
+Success

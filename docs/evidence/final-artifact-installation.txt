@@ -1,0 +1,4 @@
+APK: dist/chessclock-1.0.0.apk
+SHA-256: 732BF3653018320BB907F8A2CAEA6B027DD76ABB8F76829B42A523885C8EA793
+API 24: installed APK hash matches exactly; clean installation and offline launch succeeded.
+API 37: installed APK hash matches exactly; clean installation and offline launch succeeded.
