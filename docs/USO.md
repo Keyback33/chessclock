@@ -2,7 +2,7 @@
 
 ## Instalar
 
-1. Copiar `dist/chessclock-1.0.0.apk` al teléfono Android 7.0 o posterior.
+1. Copiar `dist/chessclock-1.1.0.apk` al teléfono Android 7.0 o posterior.
 2. Abrir el archivo y permitir a esa aplicación de archivos instalar aplicaciones desde esa fuente si Android lo solicita.
 3. Confirmar la instalación y abrir **chessclock**. No necesita Internet ni cuenta, tampoco en su primer inicio.
 
@@ -11,6 +11,8 @@ El archivo `.sha256` contiene el SHA-256 para comprobar la integridad. En Window
 ## Preparar y jugar
 
 Apoyá el celular entre ambos jugadores. En vertical, Jugador 1 usa el extremo inferior y Jugador 2 el superior. Cada mitad se lee desde su lado. En una ventana horizontal, los paneles se orientan hacia los extremos izquierdo y derecho.
+
+En **Configuración → Orientación**, antes de empezar o durante una pausa, elegí **Automática** (sigue el sensor incluso con la rotación de Android bloqueada), **Vertical** u **Horizontal**. La selección se aplica y guarda inmediatamente. Al girar, los relojes y controles de cada jugador quedan enfrentados, sin perder tiempos, turno ni jugadas; los controles centrales son compartidos.
 
 Tocá **Configurar partida** (ícono de ajustes del centro) para elegir modo, tiempos, nombres y quién empieza. El valor inicial es 30 segundos por jugada para cada participante. Los límites admitidos son de 1 segundo a 180 minutos; los segundos se ingresan de 0 a 59. Podés usar atajos y desactivar «Mismo tiempo para ambos» para dar límites diferentes.
 
@@ -26,7 +28,7 @@ El reloj activo muestra **Tu turno**, el borde destacado y el pulsador levantado
 
 ## Pausa, resultado y alarma
 
-**Pausar** detiene ambos tiempos. **Continuar** retoma al mismo jugador con el saldo exacto. En pausa se puede ajustar sonido y vibración. Para cambiar modo o duración, reiniciá primero; se pide confirmación antes de borrar la partida.
+**Pausar** detiene ambos tiempos. **Continuar** retoma al mismo jugador con el saldo exacto. En pausa se puede ajustar sonido, vibración y orientación. Para cambiar modo o duración, reiniciá primero; se pide confirmación antes de borrar la partida.
 
 Si el teléfono se bloquea, cambia de aplicación o pierde interacción, la partida se pausa. Al regresar muestra «Partida pausada por interrupción» y exige continuar explícitamente. No hay reloj ni alarma en segundo plano.
 

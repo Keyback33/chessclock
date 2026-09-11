@@ -21,7 +21,9 @@ class GameController extends ChangeNotifier {
     this.store,
     this.recovery,
     this.notice,
-  });
+  }) {
+    _run(device.setOrientation(engine.config.orientation));
+  }
   void _run(Future<void> action) {
     unawaited(
       action.catchError((Object error) {
@@ -129,6 +131,9 @@ class GameController extends ChangeNotifier {
 
   void configure(ClockConfig config) {
     if (engine.phase != GamePhase.ready) return;
+    if (engine.config.orientation != config.orientation) {
+      _run(device.setOrientation(config.orientation));
+    }
     engine.reset(config);
     _changed();
   }
@@ -140,12 +145,23 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setOrientation(ClockOrientation orientation) {
+    if (orientation == engine.config.orientation) return;
+    engine.config = engine.config.withOrientation(orientation);
+    _run(device.setOrientation(orientation));
+    // A display preference never resets a game, changes its turn or unlatches touches.
+    _save();
+    notifyListeners();
+  }
+
   void testAlarm(bool sound, bool vibration) =>
       _run(device.alarm(sound: sound, vibration: vibration));
   void silence() => _run(device.silence());
   void recover() {
     if (recovery == null) return;
+    final orientation = engine.config.orientation;
     engine = ClockEngine.restore(recovery!, engine.nowUs);
+    engine.config = engine.config.withOrientation(orientation);
     recovery = null;
     _alarmedSession = engine.phase == GamePhase.finished
         ? engine.session

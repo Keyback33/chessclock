@@ -110,10 +110,11 @@ class _ClockBoardState extends State<ClockBoard>
   }
 
   Future<void> _settings() async {
-    final audioOnly = c.engine.phase != GamePhase.ready;
+    final gameInProgress = c.engine.phase != GamePhase.ready;
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => SettingsPage(controller: c, audioOnly: audioOnly),
+        builder: (_) =>
+            SettingsPage(controller: c, gameInProgress: gameInProgress),
       ),
     );
     c.silence();
@@ -144,9 +145,20 @@ class _ClockBoardState extends State<ClockBoard>
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, bounds) {
-                    final wide = bounds.maxWidth > bounds.maxHeight;
+                    // Android may ignore axis locks on large displays/multiwindow.
+                    // Honor the manual layout there; on phones follow the actual
+                    // window while the native orientation transition completes.
+                    final wide = bounds.biggest.shortestSide >= 600
+                        ? switch (c.engine.config.orientation) {
+                            ClockOrientation.automatic =>
+                              bounds.maxWidth > bounds.maxHeight,
+                            ClockOrientation.portrait => false,
+                            ClockOrientation.landscape => true,
+                          }
+                        : bounds.maxWidth > bounds.maxHeight;
                     Widget panel(int player, int turns) => Expanded(
                       child: RotatedBox(
+                        key: ValueKey('player-orientation-$player'),
                         quarterTurns: turns,
                         child: PlayerPanel(controller: c, player: player),
                       ),
@@ -217,7 +229,7 @@ class _ClockBoardState extends State<ClockBoard>
                                       key: const ValueKey('settings'),
                                       tooltip: phase == GamePhase.ready
                                           ? 'Configurar partida'
-                                          : 'Configurar alarma',
+                                          : 'Configuración',
                                       onPressed: _settings,
                                       icon: const Icon(Icons.tune),
                                     ),

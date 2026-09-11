@@ -1,9 +1,16 @@
 import 'package:chessclock/platform/android_services.dart';
+import 'package:chessclock/domain/clock.dart';
 
 class FakeDevice implements DeviceServices {
   int alarms = 0;
   int silences = 0;
   bool awake = false;
+  final List<ClockOrientation> orientations = [];
+  @override
+  Future<void> setOrientation(ClockOrientation orientation) async {
+    orientations.add(orientation);
+  }
+
   @override
   Future<String> privateDirectory() async => '';
   @override

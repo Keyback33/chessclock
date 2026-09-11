@@ -1,6 +1,7 @@
 package ar.com.chessclock.chessclock
 
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Build
@@ -27,6 +28,15 @@ class MainActivity : FlutterActivity() {
             try {
                 when (call.method) {
                     "privateDirectory" -> result.success(noBackupFilesDir.absolutePath)
+                    "orientation" -> {
+                        requestedOrientation = when (call.arguments as? String) {
+                            "automatic" -> ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+                            "portrait" -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                            "landscape" -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                            else -> { result.error("INVALID_ORIENTATION", "Orientación inválida", null); return@setMethodCallHandler }
+                        }
+                        result.success(null)
+                    }
                     "keepAwake" -> {
                         if (call.arguments == true) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                         else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

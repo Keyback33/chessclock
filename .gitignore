@@ -69,6 +69,7 @@ app.*.map.json
 *.apk
 *.aab
 !/dist/chessclock-1.0.0.apk
+!/dist/chessclock-1.1.0.apk
 
 # Original attachments and working notes; the canonical plan is at the root
 /work/

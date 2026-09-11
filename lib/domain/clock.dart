@@ -2,6 +2,8 @@ enum ClockMode { perMove, total, stopwatch }
 
 enum GamePhase { ready, running, paused, finished }
 
+enum ClockOrientation { automatic, portrait, landscape }
+
 class ClockConfig {
   final ClockMode mode;
   final List<int> limitsMs;
@@ -10,6 +12,7 @@ class ClockConfig {
   final bool equalLimits;
   final bool sound;
   final bool vibration;
+  final ClockOrientation orientation;
   ClockConfig({
     this.mode = ClockMode.perMove,
     List<int> limitsMs = const [30000, 30000],
@@ -18,6 +21,7 @@ class ClockConfig {
     this.equalLimits = true,
     this.sound = true,
     this.vibration = true,
+    this.orientation = ClockOrientation.automatic,
   }) : limitsMs = List.unmodifiable(limitsMs),
        names = List.unmodifiable(names) {
     if (limitsMs.length != 2 ||
@@ -39,7 +43,18 @@ class ClockConfig {
         equalLimits: equalLimits,
         sound: sound,
         vibration: vibration,
+        orientation: orientation,
       );
+  ClockConfig withOrientation(ClockOrientation orientation) => ClockConfig(
+    mode: mode,
+    limitsMs: limitsMs,
+    names: names,
+    firstPlayer: firstPlayer,
+    equalLimits: equalLimits,
+    sound: sound,
+    vibration: vibration,
+    orientation: orientation,
+  );
   Map<String, Object> toJson() => {
     'mode': mode.name,
     'limitsMs': limitsMs,
@@ -48,6 +63,7 @@ class ClockConfig {
     'equalLimits': equalLimits,
     'sound': sound,
     'vibration': vibration,
+    'orientation': orientation.name,
   };
   factory ClockConfig.fromJson(Map<String, dynamic> json) => ClockConfig(
     mode: ClockMode.values.byName(json['mode'] as String),
@@ -57,6 +73,10 @@ class ClockConfig {
     equalLimits: json['equalLimits'] as bool,
     sound: json['sound'] as bool,
     vibration: json['vibration'] as bool,
+    // Version 1.0.0 preferences and game snapshots have no orientation field.
+    orientation: json.containsKey('orientation')
+        ? ClockOrientation.values.byName(json['orientation'] as String)
+        : ClockOrientation.automatic,
   );
 }
 

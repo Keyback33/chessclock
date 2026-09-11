@@ -102,6 +102,12 @@ void main() {
     await tester.pumpWidget(ChessClockApp(controller: c));
     await tester.tap(find.byKey(const ValueKey('settings')));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('seconds-0')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const ValueKey('seconds-0')), '0');
     FocusManager.instance.primaryFocus?.unfocus();
     await tester.pumpAndSettle();

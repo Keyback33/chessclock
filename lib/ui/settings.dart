@@ -11,11 +11,11 @@ String modeLabel(ClockMode mode) => switch (mode) {
 
 class SettingsPage extends StatefulWidget {
   final GameController controller;
-  final bool audioOnly;
+  final bool gameInProgress;
   const SettingsPage({
     super.key,
     required this.controller,
-    this.audioOnly = false,
+    this.gameInProgress = false,
   });
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -66,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void save() {
-    if (!widget.audioOnly && mode != ClockMode.stopwatch) {
+    if (!widget.gameInProgress && mode != ClockMode.stopwatch) {
       for (var i = 0; i < (equal ? 1 : 2); i++) {
         if (validate(minutes[i].text, i, false) != null ||
             validate(seconds[i].text, i, true) != null) {
@@ -83,7 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
       }
     }
     if (!_form.currentState!.validate()) return;
-    if (widget.audioOnly) {
+    if (widget.gameInProgress) {
       widget.controller.audio(sound, vibration);
     } else {
       final limits = mode == ClockMode.stopwatch
@@ -103,6 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
           equalLimits: equal,
           sound: sound,
           vibration: vibration,
+          orientation: widget.controller.engine.config.orientation,
         ),
       );
     }
@@ -113,7 +114,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: Text(widget.audioOnly ? 'Alarma' : 'Preparar partida'),
+      title: Text(widget.gameInProgress ? 'Configuración' : 'Preparar partida'),
     ),
     body: SafeArea(
       child: Form(
@@ -121,7 +122,35 @@ class _SettingsPageState extends State<SettingsPage> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            if (!widget.audioOnly) ...[
+            DropdownButtonFormField<ClockOrientation>(
+              key: const ValueKey('orientation-setting'),
+              initialValue: widget.controller.engine.config.orientation,
+              isExpanded: true,
+              decoration: const InputDecoration(labelText: 'Orientación'),
+              items: const [
+                DropdownMenuItem(
+                  value: ClockOrientation.automatic,
+                  child: Text('Automática'),
+                ),
+                DropdownMenuItem(
+                  value: ClockOrientation.portrait,
+                  child: Text('Vertical'),
+                ),
+                DropdownMenuItem(
+                  value: ClockOrientation.landscape,
+                  child: Text('Horizontal'),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) widget.controller.setOrientation(value);
+              },
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Automática sigue el giro del teléfono. Vertical y Horizontal fijan la disposición. Se aplica al elegirla y se guarda. Los paneles siempre quedan enfrentados.',
+            ),
+            const SizedBox(height: 24),
+            if (!widget.gameInProgress) ...[
               const Text(
                 'chessclock',
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
