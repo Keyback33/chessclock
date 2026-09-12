@@ -2,7 +2,7 @@
 
 ## Instalar
 
-1. Copiar `dist/chessclock-1.1.0.apk` al teléfono Android 7.0 o posterior.
+1. Copiar `dist/chessclock-1.1.1.apk` al teléfono Android 7.0 o posterior.
 2. Abrir el archivo y permitir a esa aplicación de archivos instalar aplicaciones desde esa fuente si Android lo solicita.
 3. Confirmar la instalación y abrir **chessclock**. No necesita Internet ni cuenta, tampoco en su primer inicio.
 
@@ -10,7 +10,7 @@ El archivo `.sha256` contiene el SHA-256 para comprobar la integridad. En Window
 
 ## Preparar y jugar
 
-Apoyá el celular entre ambos jugadores. En vertical, Jugador 1 usa el extremo inferior y Jugador 2 el superior. Cada mitad se lee desde su lado. En una ventana horizontal, los paneles se orientan hacia los extremos izquierdo y derecho.
+Apoyá el celular entre ambos jugadores. En vertical, Jugador 1 usa el extremo inferior y Jugador 2 el superior. Cada mitad se lee desde su lado. En horizontal, los paneles quedan lado a lado: Jugador 2 a la izquierda, invertido, y Jugador 1 a la derecha. Los números se leen horizontalmente desde lados opuestos de la mesa.
 
 En **Configuración → Orientación**, antes de empezar o durante una pausa, elegí **Automática** (sigue el sensor incluso con la rotación de Android bloqueada), **Vertical** u **Horizontal**. La selección se aplica y guarda inmediatamente. Al girar, los relojes y controles de cada jugador quedan enfrentados, sin perder tiempos, turno ni jugadas; los controles centrales son compartidos.
 

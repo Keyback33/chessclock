@@ -1,6 +1,6 @@
 # Compilación y firma
 
-El proyecto Flutter se encuentra directamente en la raíz `chessclock`. Nombre de aplicación y paquete Flutter: `chessclock`; applicationId y namespace Android: `ar.com.chessclock.chessclock`. Versión actual: `1.1.0+2`.
+El proyecto Flutter se encuentra directamente en la raíz `chessclock`. Nombre de aplicación y paquete Flutter: `chessclock`; applicationId y namespace Android: `ar.com.chessclock.chessclock`. Versión actual: `1.1.1+3`.
 
 ## Entorno fijado
 
@@ -36,7 +36,7 @@ flutter test integration_test -d emulator-5554
 
 `Build-Release.ps1` analiza, prueba, compila, copia el APK universal a `dist` y comprueba firma, versión, mínimo Android y ausencia de permisos de red. `Verify-Apk.ps1` permite repetir la verificación sin recompilar. El APK incluye las ABI ARM de 32 bits (`armeabi-v7a`), ARM de 64 bits (`arm64-v8a`) y x86 de 64 bits (`x86_64`).
 
-Los scripts obtienen nombre y código de versión de `pubspec.yaml`. La entrega actual es `dist/chessclock-1.1.0.apk`, con su `.sha256` y los informes públicos de firma y manifiesto en `dist/1.1.0/`. Los artefactos 1.0.0 se conservan como entrega histórica.
+Los scripts obtienen nombre y código de versión de `pubspec.yaml`. La entrega actual es `dist/chessclock-1.1.1.apk`, con su `.sha256` y los informes públicos de firma y manifiesto en `dist/1.1.1/`. Los artefactos 1.0.0 se conservan como entrega histórica.
 
 El JDK global del equipo es antiguo; Flutter utiliza el JDK de Android Studio. Los scripts seleccionan ese mismo JDK. Para otra instalación, pasar `-JavaHome` y `-AndroidSdk` a los scripts. Las rutas de `android/local.properties` son locales y se excluyen del control de versiones.
 
@@ -65,8 +65,8 @@ La hora civil no participa en los relojes ni en la recuperación. La precisión 
 
 ### Orientación
 
-`ClockOrientation` se guarda en la configuración local; los datos anteriores usan Automática por defecto. El canal Android aplica `FULL_SENSOR`, `SENSOR_PORTRAIT` o `SENSOR_LANDSCAPE`. `RotatedBox` gira el panel completo de cada jugador, siempre a 180° respecto del rival, sin reiniciar el motor. En ventanas cuyo lado corto disponible es de al menos 600 dp, la disposición manual también se aplica dentro de la ventana si Android ignora el giro solicitado.
+`ClockOrientation` se guarda en la configuración local; los datos anteriores usan Automática por defecto. El canal Android aplica `FULL_SENSOR`, `SENSOR_PORTRAIT` o `SENSOR_LANDSCAPE`. `RotatedBox` mantiene Jugador 2 a 180° y Jugador 1 a 0° dentro de la ventana, tanto en vertical como en horizontal. Android realiza el giro de la ventana; no se añade un cuarto de vuelta que lo compense. Se giran juntos esfera, números y controles, sin reiniciar el motor. En ventanas cuyo lado corto disponible es de al menos 600 dp, la disposición manual también se aplica dentro de la ventana si Android ignora el giro solicitado.
 
-Validación de 1.1.0: análisis sin incidencias, 36 pruebas unitarias/widgets e integración en emuladores API 24 y 37. Cubren persistencia, migración, rotación nativa y conservación de la partida. Comprobación en teléfono físico pendiente.
+Validación de 1.1.1: análisis sin incidencias, 36 pruebas unitarias/widgets e integración en Pixel_10 (API 37). Se verifican los ejes visibles de esfera y números, persistencia y conservación de la partida. APK firmado instalado y rotación automática revisada visualmente en ese emulador; comprobación en teléfono físico pendiente.
 
 Referencias oficiales consultadas: [distribución Android de Flutter](https://docs.flutter.dev/deployment/android), [canales de plataforma](https://docs.flutter.dev/platform-integration/platform-channels) y [Stopwatch](https://api.flutter.dev/flutter/dart-core/Stopwatch-class.html).

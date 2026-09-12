@@ -256,7 +256,9 @@ class _ClockBoardState extends State<ClockBoard>
                       ),
                     );
                     return wide
-                        ? Row(children: [panel(1, 1), controls, panel(0, 3)])
+                        // Android already rotates the window. Extra quarter turns
+                        // would cancel that rotation for the clocks themselves.
+                        ? Row(children: [panel(1, 2), controls, panel(0, 0)])
                         : Column(
                             children: [panel(1, 2), controls, panel(0, 0)],
                           );
@@ -422,6 +424,7 @@ class PlayerPanel extends StatelessWidget {
                                 child: AspectRatio(
                                   aspectRatio: 1,
                                   child: CustomPaint(
+                                    key: ValueKey('dial-$player'),
                                     painter: ClockDial(
                                       fraction: fraction,
                                       accent: accent,
@@ -442,6 +445,7 @@ class PlayerPanel extends StatelessWidget {
                                   child: AspectRatio(
                                     aspectRatio: 1,
                                     child: CustomPaint(
+                                      key: ValueKey('dial-$player'),
                                       painter: ClockDial(
                                         fraction: fraction,
                                         accent: accent,

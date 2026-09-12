@@ -75,7 +75,7 @@ void main() {
         final rotations = tester
             .widgetList<RotatedBox>(find.byType(RotatedBox))
             .map((r) => r.quarterTurns);
-        expect(rotations, size.width > size.height ? [1, 3] : [2, 0]);
+        expect(rotations, [2, 0]);
         await tester.tap(find.byKey(const ValueKey('start')));
         await tester.pump();
         expect(tester.takeException(), null);

@@ -153,7 +153,23 @@ void main() {
       expect(_turns(tester), [2, 0]);
       tester.view.physicalSize = const Size(892, 412);
       await tester.pump();
-      expect(_turns(tester), [1, 3]);
+      expect(_turns(tester), [2, 0]);
+      // Check the painted clocks' reading axes, not just their wrapper widgets.
+      // In landscape the digits must read horizontally, in opposite directions.
+      for (final player in [0, 1]) {
+        for (final element in ['time', 'dial']) {
+          final box = tester.renderObject<RenderBox>(
+            find.byKey(ValueKey('$element-$player')),
+          );
+          final origin = box.localToGlobal(Offset.zero);
+          final right = box.localToGlobal(const Offset(10, 0)) - origin;
+          final down = box.localToGlobal(const Offset(0, 10)) - origin;
+          expect(right.dy, closeTo(0, 0.001));
+          expect(down.dx, closeTo(0, 0.001));
+          expect(right.dx * (player == 0 ? 1 : -1), greaterThan(0));
+          expect(down.dy * (player == 0 ? 1 : -1), greaterThan(0));
+        }
+      }
       expect(c.engine.phase, GamePhase.running);
       expect(c.engine.activePlayer, 1);
       expect(c.engine.moves, [1, 0]);
@@ -228,10 +244,18 @@ void main() {
           );
           await tester.pumpWidget(ChessClockApp(controller: c));
           await tester.pumpAndSettle();
-          expect(
-            _turns(tester),
-            orientation == ClockOrientation.landscape ? [1, 3] : [2, 0],
+          expect(_turns(tester), [2, 0]);
+          final first = tester.getCenter(find.byKey(const ValueKey('panel-1')));
+          final second = tester.getCenter(
+            find.byKey(const ValueKey('panel-0')),
           );
+          if (orientation == ClockOrientation.landscape) {
+            expect(first.dx, lessThan(second.dx));
+            expect(first.dy, closeTo(second.dy, 0.001));
+          } else {
+            expect(first.dy, lessThan(second.dy));
+            expect(first.dx, closeTo(second.dx, 0.001));
+          }
           expect(tester.takeException(), null);
           await tester.pumpWidget(const SizedBox());
           c.dispose();

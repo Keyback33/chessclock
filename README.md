@@ -2,7 +2,7 @@
 
 Reloj de ajedrez Android para dos participantes, implementado en Flutter y Kotlin. El proyecto está directamente en esta raíz; no requiere una subcarpeta adicional.
 
-**Versión:** 1.1.0+2 · **Android mínimo:** 7.0 (API 24) · **Funcionamiento:** completamente sin conexión.
+**Versión:** 1.1.1+3 · **Android mínimo:** 7.0 (API 24) · **Funcionamiento:** completamente sin conexión.
 
 ## 📱 Vista de la aplicación
 
@@ -12,7 +12,7 @@ Reloj de ajedrez Android para dos participantes, implementado en Flutter y Kotli
 
 ## 📥 Instalar
 
-El APK se genera localmente en `dist/` siguiendo la [guía de compilación](docs/BUILD.md). Los artefactos de distribución no se incluyen en el repositorio.
+Generá el APK siguiendo la [guía de compilación](docs/BUILD.md). El archivo firmado se crea localmente en `dist/chessclock-1.1.1.apk`, junto con su checksum SHA-256 y los metadatos de verificación. La carpeta `dist` no se incluye en el repositorio.
 
 ## ⏱️ Funciones
 

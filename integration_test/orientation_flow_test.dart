@@ -52,7 +52,7 @@ void main() {
               find.byKey(const ValueKey('player-orientation-1')),
             )
             .quarterTurns,
-        1,
+        2,
       );
       expect(
         tester
@@ -60,8 +60,20 @@ void main() {
               find.byKey(const ValueKey('player-orientation-0')),
             )
             .quarterTurns,
-        3,
+        0,
       );
+      for (final player in [0, 1]) {
+        for (final element in ['time', 'dial']) {
+          final box = tester.renderObject<RenderBox>(
+            find.byKey(ValueKey('$element-$player')),
+          );
+          final axis =
+              box.localToGlobal(const Offset(10, 0)) -
+              box.localToGlobal(Offset.zero);
+          expect(axis.dy, closeTo(0, 0.001));
+          expect(axis.dx * (player == 0 ? 1 : -1), greaterThan(0));
+        }
+      }
       expect(c.engine.phase, GamePhase.paused);
       expect(c.engine.activePlayer, 1);
       expect(c.engine.valueUs(0), frozen);
