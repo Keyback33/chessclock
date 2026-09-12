@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import '../controllers/game_controller.dart';
 import '../domain/clock.dart';
 import 'dial.dart';
+import 'move_button.dart';
 import 'settings.dart';
 
 class ClockBoard extends StatefulWidget {
@@ -491,44 +492,10 @@ class PlayerPanel extends StatelessWidget {
                     )
                   else
                     ExcludeSemantics(
-                      child: AnimatedContainer(
-                        duration: MediaQuery.disableAnimationsOf(context)
-                            ? Duration.zero
-                            : const Duration(milliseconds: 90),
-                        height: 48,
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: active ? accent : const Color(0xff414c58),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: active ? accent : const Color(0xff64717f),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0x99000000),
-                              offset: Offset(0, active ? 4 : 1),
-                              blurRadius: active ? 1 : 0,
-                            ),
-                          ],
-                        ),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text(
-                              active ? 'TERMINAR JUGADA' : 'chessclock',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1,
-                                color: active
-                                    ? const Color(0xff20262d)
-                                    : const Color(0xffdce3ea),
-                              ),
-                            ),
-                          ),
-                        ),
+                      child: MoveButton(
+                        key: ValueKey('move-button-$player'),
+                        active: active,
+                        accent: accent,
                       ),
                     ),
                 ],

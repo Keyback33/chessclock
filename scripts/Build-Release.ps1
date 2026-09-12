@@ -16,4 +16,6 @@ try {
     New-Item -ItemType Directory -Force dist | Out-Null
     Copy-Item build/app/outputs/flutter-apk/app-release.apk "dist/chessclock-$version.apk"
     & "$PSScriptRoot/Verify-Apk.ps1" -AndroidSdk $AndroidSdk -JavaHome $JavaHome
+    Copy-Item -LiteralPath 'docs/RELEASE_NOTES.md' -Destination "dist/$version/RELEASE_NOTES.md"
+    & "$PSScriptRoot/Remove-OldReleases.ps1" -CurrentVersion $version
 } finally { Pop-Location }

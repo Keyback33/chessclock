@@ -14,6 +14,8 @@ void main() {
     'Android: private storage, all modes, touch, pause, alarm and restore',
     (tester) async {
       final device = AndroidServices();
+      await device
+          .moveClick(); // The channel must be available, even during preload.
       final path = await device.privateDirectory();
       expect(path, contains('no_backup'));
       final store = LocalStore(Directory('$path/integration-validation'));
@@ -35,6 +37,7 @@ void main() {
       await tester.pump();
       expect(c.engine.activePlayer, 1);
       expect(c.engine.moves, [1, 0]);
+      expect(c.notice, isNull);
       await tester.tap(find.byKey(const ValueKey('pause')));
       await tester.pumpAndSettle();
       final frozen = c.engine.valueUs(1);

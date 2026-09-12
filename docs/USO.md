@@ -2,7 +2,7 @@
 
 ## Instalar
 
-1. Copiar `dist/chessclock-1.1.1.apk` al teléfono Android 7.0 o posterior.
+1. Copiar `dist/chessclock-1.2.0.apk` al teléfono Android 7.0 o posterior.
 2. Abrir el archivo y permitir a esa aplicación de archivos instalar aplicaciones desde esa fuente si Android lo solicita.
 3. Confirmar la instalación y abrir **chessclock**. No necesita Internet ni cuenta, tampoco en su primer inicio.
 
@@ -24,7 +24,7 @@ Tocá **Configurar partida** (ícono de ajustes del centro) para elegir modo, ti
 
 Tocá **Iniciar** para activar al participante elegido. Cuando terminás una jugada, tocá cualquier parte de tu panel. Se detiene tu tiempo y empieza el del rival. El panel en espera no cambia el turno. Levantá todos los dedos antes de hacer otro cambio de turno; mantener contactos sobre la pantalla bloquea cambios repetidos.
 
-El reloj activo muestra **Tu turno**, el borde destacado y el pulsador levantado. El contador digital es la referencia precisa: minutos y segundos, horas cuando corresponda y décimas en los últimos 10 segundos. La aguja y el arco indican la proporción restante. El cronómetro completa una vuelta cada minuto.
+El reloj activo muestra **Tu turno**, el borde destacado y el pulsador con relieve 3D levantado. Al terminar la jugada, el pulsador baja y se levanta el del rival; se oye un clic mecánico breve si Sonido está activado. El contador digital es la referencia precisa: minutos y segundos, horas cuando corresponda y décimas en los últimos 10 segundos. La aguja y el arco indican la proporción restante. El cronómetro completa una vuelta cada minuto.
 
 ## Pausa, resultado y alarma
 
@@ -34,7 +34,7 @@ Si el teléfono se bloquea, cambia de aplicación o pierde interacción, la part
 
 Al llegar a cero, ambos relojes se detienen. Aparecen la bandera y **Tiempo agotado** en el panel del jugador afectado. La señal de alarma dura hasta 3,5 segundos; los botones **Silenciar** de ambos lados la detienen sin borrar el resultado. **Nueva partida** (flecha circular central) vuelve a la preparación.
 
-Sonido y vibración se configuran por separado. **Probar alarma** permite comprobarlos antes de jugar. El sonido usa el volumen de alarma de Android; no cambia el volumen global ni omite «No molestar». La bandera y el texto aparecen siempre, aunque no se oiga sonido.
+Sonido y vibración se configuran por separado. **Probar alarma** permite comprobarlos antes de jugar. La opción **Sonido** habilita el clic de jugada y la alarma. El clic usa el volumen multimedia y la alarma usa el volumen de alarma de Android; no cambia el volumen global ni omite «No molestar». La bandera y el texto aparecen siempre, aunque no se oiga sonido.
 
 ## Recuperar una partida
 

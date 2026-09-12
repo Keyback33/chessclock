@@ -3,6 +3,8 @@ package ar.com.chessclock.chessclock
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.media.AudioManager
+import android.media.AudioAttributes
+import android.media.SoundPool
 import android.media.ToneGenerator
 import android.os.Build
 import android.os.Handler
@@ -11,6 +13,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.view.WindowManager
+import io.flutter.FlutterInjector
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -20,9 +23,14 @@ class MainActivity : FlutterActivity() {
     private var tone: ToneGenerator? = null
     private var vibrator: Vibrator? = null
     private var channel: MethodChannel? = null
+    private var clickPool: SoundPool? = null
+    private var clickSound = 0
+    private var clickStream = 0
+    private var clickReady = false
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        prepareClick()
         channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "ar.com.chessclock/device")
         channel!!.setMethodCallHandler { call, result ->
             try {
@@ -46,12 +54,45 @@ class MainActivity : FlutterActivity() {
                         playAlarm(call.argument<Boolean>("sound") == true, call.argument<Boolean>("vibration") == true)
                         result.success(null)
                     }
+                    "moveClick" -> {
+                        // Never queue a late click: feedback belongs to this move.
+                        if (clickReady) {
+                            clickStream = clickPool?.play(clickSound, 0.8f, 0.8f, 1, 0, 1f) ?: 0
+                        }
+                        result.success(null)
+                    }
                     "silence" -> { silence(); result.success(null) }
                     else -> result.notImplemented()
                 }
             } catch (exception: Exception) {
                 result.error("DEVICE_ERROR", exception.message, null)
             }
+        }
+    }
+
+    private fun prepareClick() {
+        try {
+            val pool = SoundPool.Builder()
+                .setMaxStreams(1)
+                .setAudioAttributes(AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_GAME)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build())
+                .build()
+            clickPool = pool
+            pool.setOnLoadCompleteListener { loadedPool, _, status ->
+                if (clickPool === loadedPool) clickReady = status == 0
+            }
+            val assetKey = FlutterInjector.instance().flutterLoader()
+                .getLookupKeyForAsset("assets/audio/move_click.wav")
+            assets.openFd(assetKey).use { descriptor ->
+                clickSound = pool.load(descriptor, 1)
+            }
+        } catch (_: Exception) {
+            // Optional feedback must never prevent starting the clock.
+            clickPool?.release()
+            clickPool = null
+            clickReady = false
         }
     }
 
@@ -82,6 +123,8 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun silence() {
+        clickPool?.stop(clickStream)
+        clickStream = 0
         handler.removeCallbacksAndMessages(null)
         tone?.stopTone()
         tone?.release()
@@ -98,6 +141,9 @@ class MainActivity : FlutterActivity() {
 
     override fun onDestroy() {
         silence()
+        clickReady = false
+        clickPool?.release()
+        clickPool = null
         channel?.setMethodCallHandler(null)
         channel = null
         super.onDestroy()

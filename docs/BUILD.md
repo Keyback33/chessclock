@@ -1,6 +1,6 @@
 # Compilación y firma
 
-El proyecto Flutter se encuentra directamente en la raíz `chessclock`. Nombre de aplicación y paquete Flutter: `chessclock`; applicationId y namespace Android: `ar.com.chessclock.chessclock`. Versión actual: `1.1.1+3`.
+El proyecto Flutter se encuentra directamente en la raíz `chessclock`. Nombre de aplicación y paquete Flutter: `chessclock`; applicationId y namespace Android: `ar.com.chessclock.chessclock`. Versión actual: `1.2.0+4`.
 
 ## Entorno fijado
 
@@ -30,13 +30,14 @@ flutter doctor -v
 flutter pub get
 flutter analyze
 flutter test
-flutter test integration_test -d emulator-5554
+flutter test integration_test/game_flow_test.dart -d emulator-5554
+flutter test integration_test/orientation_flow_test.dart -d emulator-5554
 ./scripts/Build-Release.ps1
 ```
 
 `Build-Release.ps1` analiza, prueba, compila, copia el APK universal a `dist` y comprueba firma, versión, mínimo Android y ausencia de permisos de red. `Verify-Apk.ps1` permite repetir la verificación sin recompilar. El APK incluye las ABI ARM de 32 bits (`armeabi-v7a`), ARM de 64 bits (`arm64-v8a`) y x86 de 64 bits (`x86_64`).
 
-Los scripts obtienen nombre y código de versión de `pubspec.yaml`. La entrega actual es `dist/chessclock-1.1.1.apk`, con su `.sha256` y los informes públicos de firma y manifiesto en `dist/1.1.1/`. Los artefactos 1.0.0 se conservan como entrega histórica.
+Los scripts obtienen nombre y código de versión de `pubspec.yaml`. La entrega actual es `dist/chessclock-1.2.0.apk`, con su `.sha256` y los informes públicos de firma y manifiesto en `dist/1.2.0/`. Después de verificar el APK nuevo, `Remove-OldReleases.ps1` conserva las dos versiones más recientes por número de versión (actualmente 1.1.1 y 1.2.0), junto con sus checksums e informes. Elimina artefactos anteriores y los informes históricos de la raíz. Si falla la compilación o verificación, no se ejecuta la limpieza. `scripts/Test-ReleaseRetention.ps1` comprueba esta política con archivos temporales.
 
 El JDK global del equipo es antiguo; Flutter utiliza el JDK de Android Studio. Los scripts seleccionan ese mismo JDK. Para otra instalación, pasar `-JavaHome` y `-AndroidSdk` a los scripts. Las rutas de `android/local.properties` son locales y se excluyen del control de versiones.
 
@@ -58,7 +59,7 @@ Para otra versión, incrementar `version` en `pubspec.yaml` y mantener el identi
 - `lib/domain`: motor Dart puro, reloj monotónico inyectable, modelos y protección de contactos.
 - `lib/controllers`: transiciones, un temporizador de vencimiento y persistencia por transición. Cada cancelación invalida callbacks anteriores.
 - `lib/ui`: pantalla de juego adaptable, configuración y esfera vectorial original con `CustomPainter`. `Ticker` activo solo mientras corre la partida.
-- `lib/platform` y `MainActivity.kt`: canal propio para ruta privada, pantalla encendida, tonos, vibración y orientación por sensor o eje manual.
+- `lib/platform` y `MainActivity.kt`: canal propio para ruta privada, pantalla encendida, clic mecánico precargado con SoundPool, tonos, vibración y orientación por sensor o eje manual.
 - `lib/storage`: JSON con esquema validado, cola de escrituras y reemplazo mediante archivo temporal. Datos en `noBackupFilesDir`; recuperación explícita en pausa.
 
 La hora civil no participa en los relojes ni en la recuperación. La precisión del motor no depende de la frecuencia de los fotogramas.
@@ -70,3 +71,11 @@ La hora civil no participa en los relojes ni en la recuperación. La precisión 
 Validación de 1.1.1: análisis sin incidencias, 36 pruebas unitarias/widgets e integración en Pixel_10 (API 37). Se verifican los ejes visibles de esfera y números, persistencia y conservación de la partida. APK firmado instalado y rotación automática revisada visualmente en ese emulador; comprobación en teléfono físico pendiente.
 
 Referencias oficiales consultadas: [distribución Android de Flutter](https://docs.flutter.dev/deployment/android), [canales de plataforma](https://docs.flutter.dev/platform-integration/platform-channels) y [Stopwatch](https://api.flutter.dev/flutter/dart-core/Stopwatch-class.html).
+
+### Sonido de jugada
+
+Los archivos de sonido se ubican en `assets/audio/`, en la raíz del proyecto. La carpeta está declarada en `pubspec.yaml`; Flutter la incluye en la aplicación y Android obtiene la ruta empaquetada mediante `FlutterLoader.getLookupKeyForAsset`. SoundPool carga el descriptor del archivo desde `AssetManager`, sin mantener una copia en `android/app/src/main/res/raw/`.
+
+El recurso original `assets/audio/move_click.wav` se genera con `python scripts/Generate-MoveClick.py`: PCM mono de 16 bits, 44,1 kHz, 115 ms. Android lo precarga al iniciar y libera SoundPool al destruir la actividad. Se reproduce una vez por jugada aceptada, sin esperar el audio para alternar relojes; no se encolan clics si la carga todavía no terminó. La opción Sonido controla clic y alarma. El clic usa volumen multimedia y la alarma usa volumen de alarma. Referencia: [SoundPool de Android](https://developer.android.com/reference/android/media/SoundPool).
+
+Validación de 1.2.0: análisis sin incidencias y 41 pruebas unitarias/widgets aprobadas; integraciones de juego y orientación aprobadas por separado en API 24. En API 37 pasó el flujo de juego; la integración de orientación se interrumpió por inestabilidad del emulador y queda pendiente allí. APK de producción instalado y revisado visualmente en API 24, con ambos pulsadores activos y cambio de turno. Audio incluido en el APK y PCM sin saturación; percepción y latencia en teléfono físico pendientes. Retención comprobada con fixtures y con la distribución real: solo 1.1.1 y 1.2.0, con checksums correctos.

@@ -2,7 +2,7 @@
 
 Reloj de ajedrez Android para dos participantes, implementado en Flutter y Kotlin. El proyecto está directamente en esta raíz; no requiere una subcarpeta adicional.
 
-**Versión:** 1.1.1+3 · **Android mínimo:** 7.0 (API 24) · **Funcionamiento:** completamente sin conexión.
+**Versión:** 1.2.0+4 · **Android mínimo:** 7.0 (API 24) · **Funcionamiento:** completamente sin conexión.
 
 ## 📱 Vista de la aplicación
 
@@ -12,18 +12,20 @@ Reloj de ajedrez Android para dos participantes, implementado en Flutter y Kotli
 
 ## 📥 Instalar
 
-Generá el APK siguiendo la [guía de compilación](docs/BUILD.md). El archivo firmado se crea localmente en `dist/chessclock-1.1.1.apk`, junto con su checksum SHA-256 y los metadatos de verificación. La carpeta `dist` no se incluye en el repositorio.
+Generá el APK siguiendo la [guía de compilación](docs/BUILD.md). El archivo firmado se crea localmente en `dist/chessclock-1.2.0.apk`, junto con su checksum SHA-256 y los metadatos de verificación. Se conservan las dos versiones más recientes. La carpeta `dist` no se incluye en el repositorio.
 
 ## ⏱️ Funciones
 
 - Tres modos: límite por jugada, reserva total y cronómetro por jugada.
 - Tiempos independientes, nombres, primer participante y preferencias persistentes.
 - Orientación automática por sensor o manual (vertical/horizontal), guardada entre aperturas.
-- Paneles enfrentados, esferas originales, pulsadores grandes y protección contra contactos simultáneos.
+- Paneles enfrentados, esferas originales, pulsadores con relieve 3D y clic mecánico, y protección contra contactos simultáneos.
 - Pausa exacta, pausa por interrupción, alarma y vibración configurables, recuperación explícita del último estado guardado.
 - Sin cuentas, publicidad, red, servicios externos ni paquetes de terceros agregados para ejecución.
 
 ## 📚 Documentación y validación
+
+Los sonidos están en [`assets/audio/`](assets/audio/). El clic actual es `move_click.wav`. Podés colocar allí nuevos `.ogg` o `.wav` con nombres descriptivos; agregarlos no cambia el sonido activo, cuya ruta se selecciona en `MainActivity.kt`. El generador `scripts/Generate-MoveClick.py` recrea únicamente el clic original.
 
 - [Uso e instalación](docs/USO.md).
 - [Entorno, arquitectura, compilación y firma](docs/BUILD.md).

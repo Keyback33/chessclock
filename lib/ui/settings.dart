@@ -272,8 +272,10 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Sonido de alarma'),
-              subtitle: const Text('Usa el volumen de alarma del dispositivo'),
+              title: const Text('Sonido'),
+              subtitle: const Text(
+                'Clic de jugada: volumen multimedia. Alarma: volumen de alarma.',
+              ),
               value: sound,
               onChanged: (v) => setState(() => sound = v),
             ),

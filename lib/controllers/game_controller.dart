@@ -87,7 +87,17 @@ class GameController extends ChangeNotifier {
   }
 
   void press(int player) {
-    if (engine.press(player)) _changed();
+    _press(player);
+  }
+
+  bool _press(int player) {
+    if (!engine.press(player)) return false;
+    // press also returns true when it detects expiration: only click on a move.
+    if (engine.phase == GamePhase.running && engine.config.sound) {
+      _run(device.moveClick());
+    }
+    _changed();
+    return true;
   }
 
   void pointerDown(int pointer, int? player) {
@@ -95,9 +105,8 @@ class GameController extends ChangeNotifier {
         player != null &&
         engine.phase == GamePhase.running &&
         player == engine.activePlayer) {
-      if (engine.press(player)) {
+      if (_press(player)) {
         contacts.accept();
-        _changed();
       }
     }
   }
