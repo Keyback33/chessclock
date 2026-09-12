@@ -12,7 +12,7 @@ Reloj de ajedrez Android para dos participantes, implementado en Flutter y Kotli
 
 ## 📥 Instalar
 
-El APK universal de producción firmado está en [dist/chessclock-1.1.0.apk](dist/chessclock-1.1.0.apk). Su integridad se comprueba con [SHA-256](dist/chessclock-1.1.0.apk.sha256). La firma propia, permisos y metadatos se incluyen en `dist/1.1.0`.
+El APK se genera localmente en `dist/` siguiendo la [guía de compilación](docs/BUILD.md). Los artefactos de distribución no se incluyen en el repositorio.
 
 ## ⏱️ Funciones
 
@@ -28,7 +28,6 @@ El APK universal de producción firmado está en [dist/chessclock-1.1.0.apk](dis
 - [Uso e instalación](docs/USO.md).
 - [Entorno, arquitectura, compilación y firma](docs/BUILD.md).
 - [Validación de la versión inicial](docs/VALIDACION.md).
-- [Plan corregido para la raíz chessclock](PLAN_IMPLEMENTACION.md).
 
 Se generó e instaló el APK de producción en emuladores API 24 y API 37. Las comprobaciones sobre un teléfono físico, percepción de sonido/vibración y latencias reales quedan pendientes y se detallan en el informe. No se presentan como realizadas.
 

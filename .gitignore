@@ -65,11 +65,11 @@ app.*.map.json
 *.hprof
 .kotlin/
 
-# Keep only the reviewed, signed distribution APK
+# Local distribution artifacts
 *.apk
 *.aab
-!/dist/chessclock-1.0.0.apk
-!/dist/chessclock-1.1.0.apk
+/dist/
 
-# Original attachments and working notes; the canonical plan is at the root
+# Local implementation plan, original attachments and working notes
+/PLAN_IMPLEMENTACION.md
 /work/

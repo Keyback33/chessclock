@@ -51,7 +51,7 @@ Se usa una clave RSA de 3072 bits propia, alias `chessclock`, con una validez de
 
 Ambos están excluidos del repositorio y de `dist`, y protegidos con permisos de Windows. **Conservar una copia segura de ambos fuera del proyecto**: las actualizaciones necesitan la misma clave. Los scripts nunca imprimen la contraseña. `New-SigningKey.ps1` genera la firma solo para una instalación nueva y se niega a reemplazar material existente. No regenerarla para futuras versiones. El certificado público y el resultado de `apksigner` se entregan en `dist/<versión>/signature.txt`.
 
-Para otra versión, incrementar `version` en `pubspec.yaml`, mantener el identificador y la clave, y agregar a `.gitignore` la excepción del APK revisado que se quiera distribuir. Los scripts usan automáticamente la nueva versión.
+Para otra versión, incrementar `version` en `pubspec.yaml` y mantener el identificador y la clave. Los scripts usan automáticamente la nueva versión. `dist/` y `PLAN_IMPLEMENTACION.md` son archivos locales excluidos de Git.
 
 ## Arquitectura
 
