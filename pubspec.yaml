@@ -1,7 +1,7 @@
 name: chessclock
 description: Reloj de ajedrez para dos participantes, completamente sin conexión.
 publish_to: none
-version: 1.2.0+4
+version: 1.4.0+6
 environment:
   sdk: '>=3.11.5 <4.0.0'
   flutter: '>=3.41.9'
@@ -17,3 +17,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/audio/
+    - assets/images/move_button.png

@@ -113,11 +113,13 @@ class GameController extends ChangeNotifier {
 
   void pointerUp(int pointer) => contacts.up(pointer);
   void pause({bool interrupted = false}) {
+    // Stop previous feedback before detecting expiration, so a last-moment
+    // pause does not immediately cancel the new endgame audio.
+    _run(device.silence());
     if (engine.pause(
       reason: interrupted ? 'Partida pausada por interrupción' : null,
     ))
       _changed();
-    _run(device.silence());
   }
 
   void interrupt() {

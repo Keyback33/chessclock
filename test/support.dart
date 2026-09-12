@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:chessclock/platform/android_services.dart';
 import 'package:chessclock/domain/clock.dart';
 
@@ -6,6 +7,8 @@ class FakeDevice implements DeviceServices {
   int clicks = 0;
   bool failClick = false;
   int silences = 0;
+  final List<String> events = [];
+  final List<({bool sound, bool vibration})> alarmOptions = [];
   bool awake = false;
   final List<ClockOrientation> orientations = [];
   @override
@@ -29,10 +32,24 @@ class FakeDevice implements DeviceServices {
   @override
   Future<void> alarm({required bool sound, required bool vibration}) async {
     alarms++;
+    events.add('alarm');
+    alarmOptions.add((sound: sound, vibration: vibration));
   }
 
   @override
   Future<void> silence() async {
     silences++;
+    events.add('silence');
   }
+}
+
+class SequenceRandom implements Random {
+  int draws = 0;
+  @override
+  int nextInt(int max) => draws++ % max;
+  @override
+  bool nextBool() => throw UnsupportedError('Only integer draws are expected');
+  @override
+  double nextDouble() =>
+      throw UnsupportedError('Only integer draws are expected');
 }

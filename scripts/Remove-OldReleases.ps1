@@ -25,11 +25,8 @@ foreach ($report in @('signature.txt', 'apk-info.txt', 'permissions.txt')) {
         throw 'Faltan informes de verificación; no se eliminó ninguna versión.'
     }
 }
-$versions = @(Get-ChildItem -LiteralPath $distRoot -File | ForEach-Object {
-    if ($_.Name -match '^chessclock-(\d+\.\d+\.\d+)\.apk$') { $Matches[1] }
-} | Sort-Object { [version]$_ } -Descending -Unique)
-$keep = @($versions | Select-Object -First 2)
-if ($CurrentVersion -notin $keep) { throw 'La versión nueva no está entre las dos más recientes.' }
+# Keep the release just generated and verified, including intentional rebuilds.
+$keep = @($CurrentVersion)
 $remove = @(Get-ChildItem -LiteralPath $distRoot | Where-Object {
     $artifactVersion = $null
     if ($_.PSIsContainer -and $_.Name -match '^(\d+\.\d+\.\d+)$') { $artifactVersion = $Matches[1] }

@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import '../controllers/game_controller.dart';
@@ -345,7 +346,8 @@ class PlayerPanel extends StatelessWidget {
         : us / (e.config.limitsMs[player] * 1000);
     return Semantics(
       label:
-          '${e.config.names[player]}. $status. $text. ${e.moves[player]} jugadas.',
+          '${e.config.names[player]}. $status. $text. ${e.moves[player]} jugadas.'
+          '${active ? ' Terminar jugada.' : ''}',
       button: active,
       liveRegion: false,
       onTap: active ? () => controller.press(player) : null,
@@ -374,7 +376,7 @@ class PlayerPanel extends StatelessWidget {
                   : active
                   ? accent
                   : const Color(0xff535d67),
-              width: active || expired ? 3 : 1.5,
+              width: 2,
             ),
             boxShadow: const [
               BoxShadow(
@@ -386,9 +388,12 @@ class PlayerPanel extends StatelessWidget {
           ),
           child: LayoutBuilder(
             builder: (context, box) {
-              final compact =
-                  box.maxHeight < 290 ||
-                  MediaQuery.textScalerOf(context).scale(1) > 1.5;
+              // Keep the dial large; the footer adapts to short windows and
+              // enlarged text without moving the time away from its plunger.
+              final buttonWidth = math
+                  .min(148.0, math.min(box.maxWidth * .44, box.maxHeight * .48))
+                  .clamp(64.0, 148.0);
+              final footerHeight = buttonWidth / MoveButton.aspectRatio;
               return Column(
                 children: [
                   ExcludeSemantics(
@@ -417,87 +422,66 @@ class PlayerPanel extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    child: compact
-                        ? Row(
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: CustomPaint(
-                                    key: ValueKey('dial-$player'),
-                                    painter: ClockDial(
-                                      fraction: fraction,
-                                      accent: accent,
-                                      expired: expired,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(flex: 3, child: _digital(text, accent)),
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(6),
-                                  child: AspectRatio(
-                                    aspectRatio: 1,
-                                    child: CustomPaint(
-                                      key: ValueKey('dial-$player'),
-                                      painter: ClockDial(
-                                        fraction: fraction,
-                                        accent: accent,
-                                        expired: expired,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 66,
-                                child: _digital(text, accent),
-                              ),
-                            ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Center(
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: CustomPaint(
+                            key: ValueKey('dial-$player'),
+                            painter: ClockDial(
+                              fraction: fraction,
+                              accent: accent,
+                              expired: expired,
+                            ),
                           ),
-                  ),
-                  ExcludeSemantics(
-                    child: Text(
-                      status,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: expired
-                            ? const Color(0xffffa399)
-                            : const Color(0xfff2ead8),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.5,
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  if (finished)
-                    SizedBox(
-                      height: 48,
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: controller.silence,
-                        icon: const Icon(Icons.volume_off, size: 20),
-                        label: const Text('Silenciar'),
-                      ),
-                    )
-                  else
-                    ExcludeSemantics(
-                      child: MoveButton(
-                        key: ValueKey('move-button-$player'),
-                        active: active,
-                        accent: accent,
-                      ),
+                  SizedBox(
+                    height: footerHeight,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(child: _readout(text, status, expired)),
+                        const SizedBox(width: 12),
+                        SizedBox(
+                          width: buttonWidth,
+                          height: footerHeight,
+                          child: finished
+                              ? Center(
+                                  child:
+                                      buttonWidth <
+                                          116 *
+                                              MediaQuery.textScalerOf(
+                                                context,
+                                              ).scale(1)
+                                      ? IconButton(
+                                          tooltip: 'Silenciar alarma',
+                                          onPressed: controller.silence,
+                                          icon: const Icon(Icons.volume_off),
+                                        )
+                                      : OutlinedButton.icon(
+                                          onPressed: controller.silence,
+                                          icon: const Icon(
+                                            Icons.volume_off,
+                                            size: 20,
+                                          ),
+                                          label: const Text('Silenciar'),
+                                        ),
+                                )
+                              : ExcludeSemantics(
+                                  child: MoveButton(
+                                    key: ValueKey('move-button-$player'),
+                                    raised: e.activePlayer == player,
+                                    player: player,
+                                  ),
+                                ),
+                        ),
+                      ],
                     ),
+                  ),
                 ],
               );
             },
@@ -507,19 +491,41 @@ class PlayerPanel extends StatelessWidget {
     );
   }
 
-  Widget _digital(String text, Color accent) => ExcludeSemantics(
+  Widget _readout(String text, String status, bool expired) => ExcludeSemantics(
     child: FittedBox(
+      key: ValueKey('readout-$player'),
+      alignment: Alignment.centerLeft,
       fit: BoxFit.scaleDown,
-      child: Text(
-        text,
-        key: ValueKey('time-$player'),
-        style: const TextStyle(
-          fontSize: 62,
-          height: 1.1,
-          fontWeight: FontWeight.w700,
-          color: Color(0xfff7f0e2),
-          fontFeatures: [FontFeature.tabularFigures()],
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            text,
+            key: ValueKey('time-$player'),
+            style: const TextStyle(
+              fontSize: 62,
+              height: 1.1,
+              fontWeight: FontWeight.w700,
+              color: Color(0xfff7f0e2),
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            status,
+            key: ValueKey('status-$player'),
+            maxLines: 1,
+            style: TextStyle(
+              color: expired
+                  ? const Color(0xffffa399)
+                  : const Color(0xfff2ead8),
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ],
       ),
     ),
   );

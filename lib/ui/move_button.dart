@@ -1,111 +1,111 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
-/// The panel owns input; this face follows the clock's mechanical latch.
-class MoveButton extends StatelessWidget {
-  final bool active;
-  final Color accent;
-  const MoveButton({super.key, required this.active, required this.accent});
+/// Visual latch only: the panel accepts the move immediately on pointer down.
+/// The 17 frames per player preserve the approved geometry and metal reflections.
+class MoveButton extends StatefulWidget {
+  static const asset = 'assets/images/move_button.png';
+  // Crop only the transparent padding above/below the rendered artwork.
+  static const aspectRatio = 296 / 200;
+  final bool raised;
+  final int player;
+
+  const MoveButton({super.key, required this.raised, required this.player});
 
   @override
-  Widget build(BuildContext context) {
-    final duration = MediaQuery.disableAnimationsOf(context)
-        ? Duration.zero
-        : const Duration(milliseconds: 90);
-    final face = active ? accent : const Color(0xff495664);
-    final rim = BorderRadius.circular(12);
-    return SizedBox(
-      height: 48,
-      width: double.infinity,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            top: 6,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: rim,
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color.lerp(face, Colors.black, 0.35)!,
-                    Color.lerp(face, Colors.black, 0.7)!,
-                  ],
-                ),
-                border: Border.all(color: const Color(0xff11171d)),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x99000000),
-                    offset: Offset(0, 3),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          AnimatedPositioned(
-            duration: duration,
-            curve: Curves.easeOutCubic,
-            top: active ? 0 : 5,
-            left: 0,
-            right: 0,
-            height: 41,
-            child: AnimatedContainer(
-              duration: duration,
-              decoration: BoxDecoration(
-                borderRadius: rim,
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: const [0, 0.16, 0.78, 1],
-                  colors: [
-                    Color.lerp(face, Colors.white, active ? 0.55 : 0.25)!,
-                    Color.lerp(face, Colors.white, 0.12)!,
-                    face,
-                    Color.lerp(face, Colors.black, 0.2)!,
-                  ],
-                ),
-                border: Border.all(
-                  color: Color.lerp(face, Colors.white, 0.45)!,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0x66000000),
-                    offset: Offset(0, active ? 3 : 1),
-                    blurRadius: active ? 2 : 0,
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      active ? 'TERMINAR JUGADA' : 'chessclock',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1,
-                        color: active
-                            ? const Color(0xff20262d)
-                            : const Color(0xffdce3ea),
-                        shadows: [
-                          Shadow(
-                            color: active
-                                ? const Color(0x66ffffff)
-                                : const Color(0x99000000),
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  State<MoveButton> createState() => _MoveButtonState();
+}
+
+class _MoveButtonState extends State<MoveButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _depth = AnimationController(
+    vsync: this,
+    value: widget.raised ? 0 : 1,
+  );
+  Timer? _release;
+  bool _reduceMotion = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _reduceMotion = MediaQuery.disableAnimationsOf(context);
+    if (_reduceMotion) {
+      _release?.cancel();
+      _depth.value = widget.raised ? 0 : 1;
+    }
   }
+
+  @override
+  void didUpdateWidget(MoveButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.raised == widget.raised) return;
+    _release?.cancel();
+    if (_reduceMotion) {
+      _depth.value = widget.raised ? 0 : 1;
+    } else if (widget.raised) {
+      _depth.stop();
+      _release = Timer(const Duration(milliseconds: 70), () {
+        if (!mounted || !widget.raised) return;
+        _depth.animateTo(
+          0,
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOutCubic,
+        );
+      });
+    } else {
+      _depth.animateTo(
+        1,
+        duration: const Duration(milliseconds: 90),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _release?.cancel();
+    _depth.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => RepaintBoundary(
+    child: LayoutBuilder(
+      builder: (context, box) {
+        final tileHeight = box.maxWidth * 250 / 296;
+        final crop = (tileHeight - box.maxHeight) / 2;
+        return AnimatedBuilder(
+          animation: _depth,
+          child: Image.asset(
+            MoveButton.asset,
+            width: box.maxWidth * 6,
+            height: tileHeight * 6,
+            fit: BoxFit.fill,
+            filterQuality: FilterQuality.medium,
+            excludeFromSemantics: true,
+            gaplessPlayback: true,
+          ),
+          builder: (context, image) {
+            final frame = widget.player * 17 + (_depth.value * 16).round();
+            return ClipRect(
+              child: OverflowBox(
+                alignment: Alignment.topLeft,
+                minWidth: box.maxWidth * 6,
+                maxWidth: box.maxWidth * 6,
+                minHeight: tileHeight * 6,
+                maxHeight: tileHeight * 6,
+                child: Transform.translate(
+                  offset: Offset(
+                    -(frame % 6) * box.maxWidth,
+                    -(frame ~/ 6) * tileHeight - crop,
+                  ),
+                  child: image,
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ),
+  );
 }

@@ -65,10 +65,10 @@ app.*.map.json
 *.hprof
 .kotlin/
 
-# Local distribution artifacts
+# Build artifacts outside the published distribution
 *.apk
 *.aab
-/dist/
+!/dist/chessclock-*.apk
 
 # Local implementation plan, original attachments and working notes
 /PLAN_IMPLEMENTACION.md

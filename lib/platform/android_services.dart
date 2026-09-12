@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/services.dart';
 import '../domain/clock.dart';
 
@@ -12,6 +13,15 @@ abstract class DeviceServices {
 
 class AndroidServices implements DeviceServices {
   static const channel = MethodChannel('ar.com.chessclock/device');
+  static const endgameAssets = [
+    'assets/audio/endgame_1.mp3',
+    'assets/audio/endgame_2.mp3',
+    'assets/audio/endgame_3.mp3',
+    'assets/audio/endgame_4.mp3',
+    'assets/audio/endgame_5.mp3',
+  ];
+  final Random _random;
+  AndroidServices({Random? random}) : _random = random ?? Random();
   @override
   Future<String> privateDirectory() async =>
       (await channel.invokeMethod<String>('privateDirectory'))!;
@@ -22,7 +32,12 @@ class AndroidServices implements DeviceServices {
   Future<void> moveClick() => channel.invokeMethod('moveClick');
   @override
   Future<void> alarm({required bool sound, required bool vibration}) =>
-      channel.invokeMethod('alarm', {'sound': sound, 'vibration': vibration});
+      channel.invokeMethod('alarm', {
+        'sound': sound,
+        'vibration': vibration,
+        if (sound)
+          'asset': endgameAssets[_random.nextInt(endgameAssets.length)],
+      });
   @override
   Future<void> silence() => channel.invokeMethod('silence');
   @override

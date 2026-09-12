@@ -45,7 +45,7 @@ Resultado final: **1 prueba de integración satisfactoria en cada versión**. Re
 - Permiso de sistema solicitado: `VIBRATE`. AndroidX incorpora además un permiso interno de nivel firma para sus receptores; no es acceso a datos personales ni requiere solicitud al usuario.
 - El manifiesto combinado no contiene `INTERNET` ni `ACCESS_NETWORK_STATE`; no habilita depuración. `allowBackup=false`, exclusiones de extracción y almacenamiento en `noBackupFilesDir`.
 
-Detalles verificables: [firma pública](../dist/signature.txt), [metadatos](../dist/apk-info.txt), [permisos](../dist/permissions.txt) y [checksum](../dist/chessclock-1.0.0.apk.sha256). La clave privada y sus contraseñas no forman parte de `dist`.
+Los informes y el APK de esta validación inicial ya no se conservan en `dist`, que contiene únicamente la última entrega. Consultar la [guía de compilación](BUILD.md) para los artefactos vigentes. La clave privada y sus contraseñas no forman parte de `dist`.
 
 ## Flujos comprobados sobre el APK instalado
 

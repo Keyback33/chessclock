@@ -65,8 +65,9 @@ void main() {
           tester.view.resetDevicePixelRatio();
           tester.platformDispatcher.clearTextScaleFactorTestValue();
         });
+        var now = 0;
         final c = GameController(
-          engine: ClockEngine(ClockConfig(), () => 0),
+          engine: ClockEngine(ClockConfig(), () => now),
           device: FakeDevice(),
         );
         await tester.pumpWidget(ChessClockApp(controller: c));
@@ -81,6 +82,12 @@ void main() {
         expect(tester.takeException(), null);
         c.interrupt();
         await tester.pumpAndSettle();
+        expect(tester.takeException(), null);
+        c.resume();
+        now = 31000000;
+        c.frame();
+        await tester.pumpAndSettle();
+        expect(c.engine.phase, GamePhase.finished);
         expect(tester.takeException(), null);
         c.reset();
         await tester.pumpAndSettle();

@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): false
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=chessclock, OU=Android, O=chessclock, C=AR
+Signer #1 certificate SHA-256 digest: 8d13b1e4da4cc9679ec1d15ada8605b71d886dce9132e9cf59449f7cb7ac6dac
+Signer #1 certificate SHA-1 digest: b3bce0946c951229cffdc3cce7e135a023fc717f
+Signer #1 certificate MD5 digest: d9ee4ee56e8669ed44bda9bb8319d6a2
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 3072
+Signer #1 public key SHA-256 digest: bcf498a1b550bc86fcfddc28f35ea2f536245caf3a3746bdd80ac1113e35efe2
+Signer #1 public key SHA-1 digest: 33936fe0056829890f7fbcf389a47aa23a2a7ac7
+Signer #1 public key MD5 digest: d6bca94f6cb42d11f56fdb516b5ec4fb

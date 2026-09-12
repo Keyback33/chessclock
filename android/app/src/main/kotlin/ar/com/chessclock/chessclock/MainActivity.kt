@@ -2,10 +2,9 @@ package ar.com.chessclock.chessclock
 
 import android.content.Context
 import android.content.pm.ActivityInfo
-import android.media.AudioManager
 import android.media.AudioAttributes
 import android.media.SoundPool
-import android.media.ToneGenerator
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -20,7 +19,8 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private val handler = Handler(Looper.getMainLooper())
-    private var tone: ToneGenerator? = null
+    private var endgamePlayer: MediaPlayer? = null
+    private var endgameResult: MethodChannel.Result? = null
     private var vibrator: Vibrator? = null
     private var channel: MethodChannel? = null
     private var clickPool: SoundPool? = null
@@ -51,8 +51,12 @@ class MainActivity : FlutterActivity() {
                         result.success(null)
                     }
                     "alarm" -> {
-                        playAlarm(call.argument<Boolean>("sound") == true, call.argument<Boolean>("vibration") == true)
-                        result.success(null)
+                        playAlarm(
+                            call.argument<Boolean>("sound") == true,
+                            call.argument<Boolean>("vibration") == true,
+                            call.argument<String>("asset"),
+                            result
+                        )
                     }
                     "moveClick" -> {
                         // Never queue a late click: feedback belongs to this move.
@@ -84,7 +88,7 @@ class MainActivity : FlutterActivity() {
                 if (clickPool === loadedPool) clickReady = status == 0
             }
             val assetKey = FlutterInjector.instance().flutterLoader()
-                .getLookupKeyForAsset("assets/audio/move_click.wav")
+                .getLookupKeyForAsset("assets/audio/move_click.mp3")
             assets.openFd(assetKey).use { descriptor ->
                 clickSound = pool.load(descriptor, 1)
             }
@@ -96,41 +100,81 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun playAlarm(sound: Boolean, vibrate: Boolean) {
+    private fun playAlarm(sound: Boolean, vibrate: Boolean, asset: String?, result: MethodChannel.Result) {
         silence()
-        var audioError: Exception? = null
-        if (sound) {
-            try {
-                tone = ToneGenerator(AudioManager.STREAM_ALARM, 90)
-                tone?.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 350)
-                for (delay in listOf(700L, 1400L, 2100L, 2800L)) {
-                    handler.postDelayed({ tone?.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 350) }, delay)
+        // The result completes on playback completion, cancellation or error.
+        endgameResult = result
+        try {
+            if (vibrate) {
+                vibrator = if (Build.VERSION.SDK_INT >= 31)
+                    (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
+                else @Suppress("DEPRECATION") (getSystemService(Context.VIBRATOR_SERVICE) as Vibrator)
+                if (vibrator?.hasVibrator() == true) {
+                    val pattern = longArrayOf(0, 250, 450, 250, 450, 250, 450, 250, 450, 250)
+                    if (Build.VERSION.SDK_INT >= 26) vibrator?.vibrate(VibrationEffect.createWaveform(pattern, -1))
+                    else @Suppress("DEPRECATION") vibrator?.vibrate(pattern, -1)
                 }
-            } catch (exception: Exception) { audioError = exception }
-        }
-        if (vibrate) {
-            vibrator = if (Build.VERSION.SDK_INT >= 31)
-                (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
-            else @Suppress("DEPRECATION") (getSystemService(Context.VIBRATOR_SERVICE) as Vibrator)
-            if (vibrator?.hasVibrator() == true) {
-                val pattern = longArrayOf(0, 250, 450, 250, 450, 250, 450, 250, 450, 250)
-                if (Build.VERSION.SDK_INT >= 26) vibrator?.vibrate(VibrationEffect.createWaveform(pattern, -1))
-                else @Suppress("DEPRECATION") vibrator?.vibrate(pattern, -1)
+                // Vibration has its own duration; never truncate the selected MP3.
+                handler.postDelayed({ stopVibration() }, 3500)
             }
+            if (!sound) {
+                releaseEndgame()
+                return
+            }
+            require(asset != null && Regex("assets/audio/endgame_[1-5]\\.mp3").matches(asset)) {
+                "Audio de fin de partida inválido"
+            }
+            val player = MediaPlayer()
+            endgamePlayer = player
+            player.setAudioAttributes(AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build())
+            player.isLooping = false
+            player.setOnPreparedListener { prepared ->
+                if (endgamePlayer === prepared) {
+                    try { prepared.start() }
+                    catch (exception: Exception) { releaseEndgame(exception.message ?: "No se pudo iniciar el audio") }
+                }
+            }
+            player.setOnCompletionListener { completed ->
+                if (endgamePlayer === completed) releaseEndgame()
+            }
+            player.setOnErrorListener { failed, what, extra ->
+                if (endgamePlayer === failed) releaseEndgame("Error de reproducción: $what / $extra")
+                true
+            }
+            val assetKey = FlutterInjector.instance().flutterLoader().getLookupKeyForAsset(asset)
+            assets.openFd(assetKey).use { descriptor ->
+                player.setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
+            }
+            player.prepareAsync()
+        } catch (exception: Exception) {
+            releaseEndgame(exception.message ?: "No se pudo cargar el audio")
         }
-        handler.postDelayed({ silence() }, 3500)
-        audioError?.let { throw it }
+    }
+
+    private fun releaseEndgame(error: String? = null) {
+        val player = endgamePlayer
+        endgamePlayer = null
+        player?.release()
+        val pending = endgameResult
+        endgameResult = null
+        if (error == null) pending?.success(null)
+        else pending?.error("AUDIO_ERROR", error, null)
+    }
+
+    private fun stopVibration() {
+        vibrator?.cancel()
+        vibrator = null
     }
 
     private fun silence() {
         clickPool?.stop(clickStream)
         clickStream = 0
         handler.removeCallbacksAndMessages(null)
-        tone?.stopTone()
-        tone?.release()
-        tone = null
-        vibrator?.cancel()
-        vibrator = null
+        releaseEndgame()
+        stopVibration()
     }
 
     override fun onPause() {

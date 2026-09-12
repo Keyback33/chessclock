@@ -4,6 +4,59 @@ import 'package:chessclock/domain/clock.dart';
 import 'support.dart';
 
 void main() {
+  testWidgets('expiration on pause does not silence the new endgame audio', (
+    tester,
+  ) async {
+    var now = 0;
+    final device = FakeDevice();
+    final c = GameController(
+      engine: ClockEngine(ClockConfig(limitsMs: [1000, 1000]), () => now),
+      device: device,
+    );
+    c.start();
+    now = 1000000;
+    c.pause();
+    expect(c.engine.phase, GamePhase.finished);
+    expect(device.events, ['silence', 'alarm']);
+    c.frame();
+    c.setOrientation(ClockOrientation.landscape);
+    expect(device.alarms, 1);
+    c.dispose();
+  });
+
+  testWidgets(
+    'muted finish keeps vibration and recovered result stays silent',
+    (tester) async {
+      var now = 0;
+      final device = FakeDevice();
+      final c = GameController(
+        engine: ClockEngine(
+          ClockConfig(limitsMs: [1000, 1000], sound: false, vibration: true),
+          () => now,
+        ),
+        device: device,
+      );
+      c.start();
+      now = 1000000;
+      c.frame();
+      expect(device.alarmOptions.single, (sound: false, vibration: true));
+      final saved = c.engine.snapshot();
+      c.dispose();
+      final recoveredDevice = FakeDevice();
+      final recovered = GameController(
+        engine: ClockEngine(ClockConfig(), () => now),
+        device: recoveredDevice,
+        recovery: saved,
+      );
+      recovered.recover();
+      recovered.frame();
+      recovered.press(0);
+      expect(recovered.engine.phase, GamePhase.finished);
+      expect(recoveredDevice.alarms, 0);
+      recovered.dispose();
+    },
+  );
+
   testWidgets('one click per accepted move, including semantic activation', (
     tester,
   ) async {
